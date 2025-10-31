@@ -64,10 +64,12 @@ add_executable(sgl_simulator ${DEMO_SOURCES})
 # 链接库
 target_link_libraries(sgl_simulator sgl ${SDL2_LIB_NAME})
 
-configure_file(
-    "${DEMO_DIR}/sgl_config.h"
-    "${SGL_ROOT_DIR}/sgl/source/sgl_config.h"
-    COPYONLY
+add_custom_command(
+    TARGET sgl_simulator POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${DEMO_DIR}/sgl_config.h"
+        "${SGL_ROOT_DIR}/sgl/source/sgl_config.h"
+    COMMENT "Force copying sgl_config.h (always overwrite)"
 )
 
 add_custom_command(
