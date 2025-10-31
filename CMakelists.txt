@@ -1,0 +1,93 @@
+cmake_minimum_required(VERSION 3.10)
+project(sgl C CXX)
+
+# 定义可执行文件目标
+# add_executable(myapp demo/main.c)
+
+# 设置C标准
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# 定义输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
+
+# 主目录
+set(SGL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(DEMO_DIR ${SGL_ROOT_DIR}/demo)
+
+# SGL库源文件
+file(GLOB SGL_CORE_SOURCES ${SGL_ROOT_DIR}/sgl/source/core/*.c)
+file(GLOB SGL_DRAW_SOURCES ${SGL_ROOT_DIR}/sgl/source/draw/*.c)
+file(GLOB SGL_FONTS_SOURCES ${SGL_ROOT_DIR}/sgl/source/fonts/*.c)
+file(GLOB SGL_MM_SOURCES ${SGL_ROOT_DIR}/sgl/source/mm/lwmem/*.c)
+file(GLOB SGL_WIDGETS_SOURCES ${SGL_ROOT_DIR}/sgl/source/widgets/*/*.c)
+
+# 合并所有SGL源文件
+set(SGL_SOURCES
+    ${SGL_CORE_SOURCES}
+    ${SGL_DRAW_SOURCES}
+    ${SGL_FONTS_SOURCES}
+    ${SGL_MM_SOURCES}
+    ${SGL_WIDGETS_SOURCES}
+)
+
+# 包含目录
+include_directories(
+    ${SGL_ROOT_DIR}/sgl/source
+    ${SGL_ROOT_DIR}/sgl/source/include
+    ${DEMO_DIR}/sdl/include/SDL2
+)
+
+# 创建SGL库
+add_library(sgl STATIC ${SGL_SOURCES})
+
+# Demo应用程序源文件
+set(DEMO_SOURCES
+    ${DEMO_DIR}/main.c
+    ${DEMO_DIR}/sgl_port_sdl2.c
+    ${DEMO_DIR}/test.c
+    ${DEMO_DIR}/bg.c
+)
+
+set(SDL2_LIB_NAME
+    mingw32 SDL2main SDL2
+)
+link_directories(
+    ${DEMO_DIR}/sdl/lib
+)
+
+# 创建演示应用程序
+add_executable(sgl_simulator ${DEMO_SOURCES})
+
+# 链接库
+target_link_libraries(sgl_simulator sgl ${SDL2_LIB_NAME})
+
+configure_file(
+    "${DEMO_DIR}/sgl_config.h"
+    "${SGL_ROOT_DIR}/sgl/source/sgl_config.h"
+    COPYONLY
+)
+
+add_custom_command(
+    TARGET sgl_simulator POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${DEMO_DIR}/sdl/bin/SDL2.dll"
+        $<TARGET_FILE_DIR:sgl_simulator>
+    COMMENT "Copying SDL2.dll to output directory"
+)
+
+# 安装规则
+install(TARGETS sgl_simulator
+    RUNTIME DESTINATION bin
+)
+
+# 复制配置文件到构建目录
+file(COPY ${DEMO_DIR}/lm.cfg DESTINATION ${CMAKE_BINARY_DIR}/)
+
+# 输出信息
+message(STATUS "SGL project configured successfully")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
