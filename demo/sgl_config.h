@@ -9,7 +9,6 @@
 
 #define  CONFIG_SGL_PANEL_PIXEL_DEPTH                      32
 #define  CONFIG_SGL_EVENT_QUEUE_SIZE                       16
-#define  CONFIG_SGL_DIRTY_AREA_THRESHOLD                   64
 #define  CONFIG_SGL_DRAW_USE_DMA                           0   
 #define  CONFIG_SGL_COLOR16_SWAP                           0   
 #define  CONFIG_SGL_ANIMATION                              1
@@ -17,9 +16,7 @@
 #define  CONFIG_SGL_DEBUG                                  1
 #define  CONFIG_SGL_LOG_COLOR                              y
 #define  CONFIG_SGL_LOG_LEVEL                              0
-#define  CONFIG_SGL_TEXT_UTF8                              1  
 #define  CONFIG_SGL_OBJ_USE_NAME                           1
-#define  CONFIG_SGL_USE_STYLE_UNIFIED_API                  1
 #define  CONFIG_SGL_BOOT_LOGO                              0
 #define  CONFIG_SGL_BOOT_ANIMATION                         1
 #define  CONFIG_SGL_HEAP_ALGO                              lwmem

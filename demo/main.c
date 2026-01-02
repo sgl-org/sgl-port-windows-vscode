@@ -547,9 +547,6 @@ void button_callback(sgl_event_t *event)
         sgl_msgbox_set_apply_text(msgbox[msgbox_inx], "GOT IT");
         sgl_msgbox_set_close_text(msgbox[msgbox_inx], "CANCEL");
         sgl_msgbox_set_radius(msgbox[msgbox_inx], 8);
-        sgl_msgbox_set_apply_icon(msgbox[msgbox_inx], &ok_icon);
-        sgl_msgbox_set_close_icon(msgbox[msgbox_inx], &cancel_icon);
-        sgl_msgbox_set_title_icon(msgbox[msgbox_inx], &cancel_icon);
         x_ps += 20;
         y_ps += 20;
 
@@ -861,7 +858,6 @@ int main(int argc, char *argv[])
 
         sgl_task_handle();
 
-
         //sgl_obj_set_dirty(sgl_screen_act());
         x +=1;
         if(x > 1000000 && count < 10) {
@@ -871,12 +867,8 @@ int main(int argc, char *argv[])
             eve.type = SGL_EVENT_MOVE_UP;
             sgl_event_send(eve);
 
-            eve.obj = switch_obj;
-            eve.type = SGL_EVENT_PRESSED;
-            sgl_event_send(eve);
-            eve.obj = switch_obj;
-            eve.type = SGL_EVENT_RELEASED;
-            sgl_event_send(eve);
+            sgl_event_send_obj(switch_obj, SGL_EVENT_PRESSED);
+            sgl_event_send_obj(switch_obj, SGL_EVENT_RELEASED);
         }
 
         // sgl_obj_set_pos(rect, x, x);

@@ -32,7 +32,7 @@
 
 #define  CONFIG_SGL_PANEL_WIDTH         800
 #define  CONFIG_SGL_PANEL_HEIGHT        480
-#define  CONFIG_SGL_PANEL_BUFFER_LINE   40
+#define  CONFIG_SGL_PANEL_BUFFER_LINE   100
 
 
 static SDL_Renderer * m_renderer = NULL;
@@ -147,7 +147,7 @@ static int mouse_event_interrupt(void *userdata, SDL_Event *event)
 }
 
 
-static void panel_flush_area(int16_t x1, int16_t y1, int16_t x2, int16_t y2, sgl_color_t *src)
+static bool panel_flush_area(int16_t x1, int16_t y1, int16_t x2, int16_t y2, sgl_color_t *src)
 {
     // x2, y2 are coordinates, not dimensions
     // Calculate width and height
@@ -164,11 +164,12 @@ static void panel_flush_area(int16_t x1, int16_t y1, int16_t x2, int16_t y2, sgl
     }
 
     flush_window(m_renderer);
+    return true;
 }
 
 
-static sgl_color_t panel_buffer[CONFIG_SGL_PANEL_WIDTH * CONFIG_SGL_PANEL_BUFFER_LINE] = {0};
-
+static sgl_color_t panel_buffer1[CONFIG_SGL_PANEL_WIDTH * CONFIG_SGL_PANEL_BUFFER_LINE] = {0};
+static sgl_color_t panel_buffer2[CONFIG_SGL_PANEL_WIDTH * CONFIG_SGL_PANEL_BUFFER_LINE] = {0};
 
 void log_stdout(const char *str)
 {
@@ -187,8 +188,9 @@ sgl_port_sdl2_t* sgl_port_sdl2_init(void)
         .xres_virtual = CONFIG_SGL_PANEL_WIDTH,
         .yres_virtual = CONFIG_SGL_PANEL_HEIGHT,
         .flush_area = panel_flush_area,
-        .buffer = panel_buffer,
-        .buffer_size = SGL_ARRAY_SIZE(panel_buffer),
+        .buffer[0] = panel_buffer1,
+        .buffer[1] = panel_buffer2,
+        .buffer_size = SGL_ARRAY_SIZE(panel_buffer1),
     };
 
     sgl_device_log_register(log_stdout);
