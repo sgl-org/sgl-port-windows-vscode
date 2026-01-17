@@ -7,10 +7,11 @@ Download gcc from this address (https://github.com/niXman/mingw-builds-binaries/
 ### 3. cd sgl-port-windows-vscode
 ### 4. git submodule init
 ### 5. git submodule update --remote
-### 6. open the sgl-port-windows-vscode with vscode
-### 7. 点击运行按钮
+### 6. 使用vscode打开sgl-port-windows-vscode目录
+### 7. 将demo/sgl_config.h配置文件覆盖到sgl/source/sgl_config.h配置文件中
+### 8. 点击运行按钮
 ![alt text](demo/imgs/image.png)
-### 8. 选择工具链
+### 9. 选择工具链
 ![alt text](demo/imgs/image-1.png)
-### 9. 选择sgl_simulator
+### 10. 选择sgl_simulator
 ![alt text](demo/imgs/image-2.png)
