@@ -308,7 +308,6 @@ static const uint8_t default_icon_pixmap[] =
 
 static sgl_icon_pixmap_t delete_icon = {
     .bitmap = default_icon_pixmap,
-    .bpp = 4,
     .height = 24,
     .width = 22,
 };
@@ -494,7 +493,6 @@ static const uint8_t ok_icon_pixmap[] = {
 
 static sgl_icon_pixmap_t ok_icon = {
     .bitmap = ok_icon_pixmap,
-    .bpp = 4,
     .height = 16,
     .width = 22,
 };
@@ -520,7 +518,6 @@ static const uint8_t cancel_icon_pixmap[] = {
 
 static sgl_icon_pixmap_t cancel_icon = {
     .bitmap = cancel_icon_pixmap,
-    .bpp = 4,
     .height = 14,
     .width = 16,
 };
@@ -627,11 +624,10 @@ int main(int argc, char *argv[])
     sgl_rect_set_color(rect4, SGL_COLOR_GRAY);
 
     sgl_obj_t *label = sgl_label_create(rect);
-    sgl_label_set_font(label, &song23);
+    sgl_label_set_font(label, &consolas23);
     sgl_label_set_text_color(label, SGL_COLOR_RED);
     sgl_label_set_radius(label, 10);
     sgl_label_set_text(label, "Hello World!");
-    sgl_label_set_icon(label, &ok_icon);
     //sgl_label_set_text_align(label, SGL_ALIGN_TOP_LEFT);
 
     sgl_obj_t *button = sgl_button_create(NULL);
@@ -643,7 +639,6 @@ int main(int argc, char *argv[])
     sgl_button_set_text_color(button, sgl_int2color(0x5de));
     sgl_button_set_text(button, "Delete me");
     sgl_button_set_alpha(button, 255);
-    sgl_button_set_icon(button, &delete_icon);
 
     sgl_obj_t *circle = sgl_circle_create(NULL);
     sgl_obj_set_pos(circle, 100, 100);
@@ -683,12 +678,13 @@ int main(int argc, char *argv[])
 
     sgl_obj_t *slider = sgl_slider_create(NULL);
     sgl_obj_set_pos(slider, 300, 250);
-    sgl_obj_set_size(slider, 50, 200);
-    sgl_slider_set_direct(slider, SGL_DIRECT_VERTICAL);
+    sgl_obj_set_size(slider, 200, 40);
+    //sgl_slider_set_direct(slider, SGL_DIRECT_VERTICAL);
     sgl_slider_set_fill_color(slider, SGL_COLOR_RED);
     sgl_slider_set_track_color(slider, SGL_COLOR_GRAY);
     sgl_slider_set_fill_alpha(slider, 255);
     sgl_slider_set_border_width(slider, 2);
+    sgl_slider_set_radius(slider, 20);
 
     sgl_obj_t *labeldede = sgl_label_create(slider);
     sgl_label_set_font(labeldede, &consolas23);
@@ -721,7 +717,7 @@ int main(int argc, char *argv[])
     sgl_obj_set_event_cb(button, button_callback, (size_t)rect43);
 
     sgl_obj_t *checkbox = sgl_checkbox_create(NULL);
-    sgl_obj_set_pos(checkbox, 200, 350);
+    sgl_obj_set_pos(checkbox, 400, 350);
     sgl_obj_set_size(checkbox, 200, 23);
     sgl_checkbox_set_font(checkbox, &song23);
     sgl_checkbox_set_text(checkbox, "Check Box Test");
