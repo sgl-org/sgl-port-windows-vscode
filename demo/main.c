@@ -541,8 +541,8 @@ void button_callback(sgl_event_t *event)
         sgl_msgbox_set_font(msgbox[msgbox_inx], &consolas23);
         sgl_msgbox_set_title_text(msgbox[msgbox_inx], "FBI WARNING");
         sgl_msgbox_set_msg_text(msgbox[msgbox_inx], "The Federal Bureau of Investigation (FBI) has seized this domain because it is involved in facilitating the illegal distribution of copyrighted materials, including movies, music, software, and games. Engaging in the unauthorized reproduction, distribution, or exhibition of copyrighted material is a violation of federal law.");
-        sgl_msgbox_set_apply_text(msgbox[msgbox_inx], "GOT IT");
-        sgl_msgbox_set_close_text(msgbox[msgbox_inx], "CANCEL");
+        sgl_msgbox_set_left_btn_text(msgbox[msgbox_inx], "GOT IT");
+        sgl_msgbox_set_right_btn_text(msgbox[msgbox_inx], "CANCEL");
         sgl_msgbox_set_radius(msgbox[msgbox_inx], 8);
         x_ps += 20;
         y_ps += 20;
