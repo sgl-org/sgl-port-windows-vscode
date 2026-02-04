@@ -590,8 +590,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    sgl_boot_logo();
-
     //sgl_obj_t *desktop2 = sgl_obj_create(NULL);
 
     sgl_page_set_pixmap(sgl_screen_act(), &test_pixmap);
