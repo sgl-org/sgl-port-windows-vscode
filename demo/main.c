@@ -852,7 +852,7 @@ int main(int argc, char *argv[])
         //     sgl_obj_set_destroyed(listview);
         // }
 
-        sgl_task_handle();
+        sgl_task_handler();
 
         //sgl_obj_set_dirty(sgl_screen_act());
         x +=1;
