@@ -18,14 +18,14 @@ extern const unsigned char gImage_btn[230400];
 const sgl_pixmap_t keyboard_pixmap = {
     .width = 64,
     .height = 64,
-    .bitmap = gImage_btn,
+    .bitmap.array = gImage_btn,
 };
 
 extern const unsigned char gImage_test[1440000];
 const sgl_pixmap_t test_pixmap = {
     .width = 800,
     .height = 480,
-    .bitmap = gImage_test,
+    .bitmap.array = gImage_test,
 };
 
 sgl_obj_t *rect43 = NULL;
@@ -636,7 +636,7 @@ int main(int argc, char *argv[])
     sgl_button_set_font(button, &consolas23);
     sgl_button_set_radius(button, 60);
     sgl_button_set_border_width(button, 0);
-    sgl_button_set_text_color(button, sgl_int2color(0x5de));
+    sgl_button_set_text_color(button, sgl_color_hex(0x5de));
     sgl_button_set_text(button, "Delete me");
     sgl_button_set_alpha(button, 255);
 
@@ -656,6 +656,7 @@ int main(int argc, char *argv[])
     sgl_obj_t *switch_obj = sgl_switch_create(NULL);
     sgl_obj_set_pos(switch_obj, 500, 100);
     sgl_obj_set_size(switch_obj, 100, 40);
+    sgl_obj_set_radius(switch_obj, 20);
 
     // sgl_obj_t *switch_obj2 = sgl_switch_create(rect);
     // sgl_obj_set_pos(switch_obj2, 150, 380);
@@ -682,7 +683,7 @@ int main(int argc, char *argv[])
     //sgl_slider_set_direct(slider, SGL_DIRECT_VERTICAL);
     sgl_slider_set_fill_color(slider, SGL_COLOR_RED);
     sgl_slider_set_track_color(slider, SGL_COLOR_GRAY);
-    sgl_slider_set_fill_alpha(slider, 255);
+    sgl_slider_set_fill_color(slider, sgl_color_hex(255));
     sgl_slider_set_border_width(slider, 2);
     sgl_slider_set_radius(slider, 20);
 
@@ -690,7 +691,7 @@ int main(int argc, char *argv[])
     sgl_label_set_font(labeldede, &consolas23);
     sgl_label_set_text(labeldede, "10%");
 
-    sgl_obj_set_event_cb(slider, slider_callback, (size_t)labeldede);
+    sgl_obj_set_event_cb(slider, slider_callback, labeldede);
 
     // sgl_obj_t *label2 = sgl_label_create(slider);
     // sgl_obj_set_font(label2, &consolas23);
@@ -714,7 +715,7 @@ int main(int argc, char *argv[])
     // sgl_obj_set_clickable(rect43);
     // sgl_obj_set_alpha(rect43, 128);
 
-    sgl_obj_set_event_cb(button, button_callback, (size_t)rect43);
+    sgl_obj_set_event_cb(button, button_callback, rect43);
 
     sgl_obj_t *checkbox = sgl_checkbox_create(NULL);
     sgl_obj_set_pos(checkbox, 400, 350);
@@ -724,7 +725,7 @@ int main(int argc, char *argv[])
     sgl_checkbox_set_status(checkbox, 1);
 
     //sgl_obj_set_align(msgbox, SGL_ALIGN_CENTER);
-    // sgl_obj_set_event_cb(msgbox, msgbox_callback, (size_t)rect43);
+    // sgl_obj_set_event_cb(msgbox, msgbox_callback, rect43);
 
     // sgl_obj_t *icon = sgl_icon_create(NULL);
     // sgl_obj_set_pos(icon, 100, 300);
@@ -812,7 +813,7 @@ int main(int argc, char *argv[])
     sgl_obj_set_size(keyboard, 800, 200);
     sgl_keyboard_set_text_font(keyboard, &consolas23);
     sgl_obj_set_pos_align(keyboard, SGL_ALIGN_BOT_MID);
-    // sgl_obj_set_event_cb(keyboard, keyboard_callback, (size_t)keyboard);
+    // sgl_obj_set_event_cb(keyboard, keyboard_callback, keyboard);
 
     // sgl_obj_t *textline2 = sgl_textline_create(NULL);
     // sgl_obj_set_pos(textline2, 0, 0);

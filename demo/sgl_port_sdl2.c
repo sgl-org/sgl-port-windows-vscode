@@ -95,8 +95,8 @@ static uint32_t system_tick(uint32_t interval, void *param)
     sgl_mm_monitor_t mm = sgl_mm_get_monitor();
     sgl_port_sdl2_t *sdl2_dev = (sgl_port_sdl2_t*)param;
     SGL_UNUSED(mm);
-    printf("SGL SDL2 Frame = %d\n", sdl2_dev->frame_count);
-    printf("Memory: total: %d used: %d, free = %d\n", mm.total_size, mm.used_size, mm.free_size);
+    //printf("SGL SDL2 Frame = %d\n", sdl2_dev->frame_count);
+    //printf("Memory: total: %d used: %d, free = %d\n", mm.total_size, mm.used_size, mm.free_size);
     sdl2_dev->frame_count = 0;
 	return interval;
 }
@@ -110,10 +110,10 @@ static uint32_t anim_systick(uint32_t interval, void *param)
 }
 
 
-static bool mouse_press = false;
-
 static int mouse_event_interrupt(void *userdata, SDL_Event *event) 
 {
+    static bool mouse_press = false;
+    bool pressed = false;
     SGL_UNUSED(userdata);
 
     sgl_event_pos_t pos;
@@ -121,23 +121,24 @@ static int mouse_event_interrupt(void *userdata, SDL_Event *event)
     {
     case SDL_MOUSEBUTTONDOWN:
         mouse_press = true;
-        pos.x = event->motion.x;
-        pos.y = event->motion.y;
-        sgl_event_send_pos(pos, SGL_EVENT_PRESSED);
+        pos.x = event->button.x;
+        pos.y = event->button.y;
+        pressed = true;
+        sgl_event_pos_input(pos.x, pos.y, pressed);
         break;
 
     case SDL_MOUSEBUTTONUP:
-        pos.x = event->motion.x;
-        pos.y = event->motion.y;
+        pos.x = event->button.x;
+        pos.y = event->button.y;
         mouse_press = false;
-        sgl_event_send_pos(pos, SGL_EVENT_RELEASED);
+        sgl_event_pos_input(pos.x, pos.y, pressed);
         break;
 
     case SDL_MOUSEMOTION:
         if(mouse_press) {
             pos.x = event->motion.x;
             pos.y = event->motion.y;
-            sgl_event_send_pos(pos, SGL_EVENT_MOTION);
+            sgl_event_pos_input(pos.x, pos.y, true);
         }
         break;
 
@@ -234,7 +235,6 @@ void sgl_port_sdl2_increase_frame_count(sgl_port_sdl2_t* sdl2_dev)
 {
     sdl2_dev->frame_count ++;
 }
-
 
 void sgl_port_sdl2_deinit(sgl_port_sdl2_t* sdl2_dev)
 {
