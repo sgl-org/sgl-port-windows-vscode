@@ -1,7 +1,6 @@
 TARGET    := sgl_simulator
 BUILD_DIR := build
 
-
 # toolchain
 CC_PREFIX ?=
 CC = $(CC_PREFIX)gcc
@@ -18,7 +17,6 @@ CPATH     := -Isdl/include/SDL2      \
 
 CFLAGS    := $(CPATH) -O2 -Wl,-Bstatic -ffunction-sections -fdata-sections -nostdlib -ffreestanding -Wunused-function -Wall -Wextra -Werror -std=c99  -g
 LDFLAGS   := -lmingw32 -lSDL2main -lSDL2.dll -Lsdl/lib -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
-
 
 SOURCE    := main.c sgl_port_sdl2.c  test.c bg.c  \
 			../sgl/source/core/sgl_core.c    \

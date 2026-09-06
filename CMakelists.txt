@@ -17,16 +17,18 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(SGL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(DEMO_DIR ${SGL_ROOT_DIR}/demo)
 
-# SGL库源文件
+# SGL 库源文件
 file(GLOB SGL_CORE_SOURCES ${SGL_ROOT_DIR}/sgl/source/core/*.c)
+file(GLOB SGL_TIMER_SOURCES ${SGL_ROOT_DIR}/sgl/source/components/timer/*.c)
 file(GLOB SGL_DRAW_SOURCES ${SGL_ROOT_DIR}/sgl/source/draw/*.c)
 file(GLOB SGL_FONTS_SOURCES ${SGL_ROOT_DIR}/sgl/source/fonts/*.c)
 file(GLOB SGL_MM_SOURCES ${SGL_ROOT_DIR}/sgl/source/mm/lwmem/*.c)
 file(GLOB SGL_WIDGETS_SOURCES ${SGL_ROOT_DIR}/sgl/source/widgets/*/*.c)
 
-# 合并所有SGL源文件
+# 合并所有 SGL 源文件
 set(SGL_SOURCES
     ${SGL_CORE_SOURCES}
+    ${SGL_TIMER_SOURCES}
     ${SGL_DRAW_SOURCES}
     ${SGL_FONTS_SOURCES}
     ${SGL_MM_SOURCES}
@@ -49,6 +51,28 @@ set(DEMO_SOURCES
     ${DEMO_DIR}/sgl_port_sdl2.c
     ${DEMO_DIR}/test.c
     ${DEMO_DIR}/bg.c
+    ${SGL_ROOT_DIR}/sgl/examples/button.c
+    ${SGL_ROOT_DIR}/sgl/examples/label.c
+    ${SGL_ROOT_DIR}/sgl/examples/rect.c
+    ${SGL_ROOT_DIR}/sgl/examples/scrollview.c
+    ${SGL_ROOT_DIR}/sgl/examples/menu.c
+    ${SGL_ROOT_DIR}/sgl/examples/launcher.c
+    ${SGL_ROOT_DIR}/sgl/examples/2dball.c
+    ${SGL_ROOT_DIR}/sgl/examples/analogclock.c
+    ${SGL_ROOT_DIR}/sgl/examples/bar.c
+    ${SGL_ROOT_DIR}/sgl/examples/battery.c
+    ${SGL_ROOT_DIR}/sgl/examples/dropdown.c
+    ${SGL_ROOT_DIR}/sgl/examples/stepper.c
+    ${SGL_ROOT_DIR}/sgl/examples/switch.c
+    ${SGL_ROOT_DIR}/sgl/examples/roller.c
+    ${SGL_ROOT_DIR}/sgl/examples/slider.c
+    ${SGL_ROOT_DIR}/sgl/examples/led.c
+    ${SGL_ROOT_DIR}/sgl/examples/scope.c
+    ${SGL_ROOT_DIR}/sgl/examples/qrcode.c
+    ${SGL_ROOT_DIR}/sgl/examples/textlist.c
+    ${SGL_ROOT_DIR}/sgl/examples/checkbox.c
+    ${SGL_ROOT_DIR}/sgl/examples/msgbox.c
+    ${SGL_ROOT_DIR}/sgl/examples/progress.c
 )
 
 set(SDL2_LIB_NAME
