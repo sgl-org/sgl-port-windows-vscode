@@ -73,6 +73,7 @@ set(DEMO_SOURCES
     ${SGL_ROOT_DIR}/sgl/examples/checkbox.c
     ${SGL_ROOT_DIR}/sgl/examples/msgbox.c
     ${SGL_ROOT_DIR}/sgl/examples/progress.c
+    ${SGL_ROOT_DIR}/sgl/examples/physical_key.c
 )
 
 set(SDL2_LIB_NAME

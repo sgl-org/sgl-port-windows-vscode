@@ -38,6 +38,18 @@ void sgl_checkbox_examples(sgl_obj_t *parent);
 void sgl_textlist_examples(sgl_obj_t *parent);
 void sgl_msgbox_examples(sgl_obj_t *parent);
 void sgl_progress_examples(sgl_obj_t *parent);
+void sgl_physical_key_examples(sgl_obj_t *parent);
+
+/* physical key handler from sgl/examples/physical_key.c */
+typedef enum physical_key {
+    PHYSICAL_KEY_UP,
+    PHYSICAL_KEY_DOWN,
+    PHYSICAL_KEY_LEFT,
+    PHYSICAL_KEY_RIGHT,
+    PHYSICAL_KEY_ENTER,
+    PHYSICAL_KEY_ESC,
+} physical_key_t;
+void sgl_physical_key_handler(physical_key_t key, bool pressed);
 
 int main(int argc, char *argv[])
 {
@@ -73,6 +85,7 @@ int main(int argc, char *argv[])
     sgl_textlist_examples(NULL);
     sgl_msgbox_examples(NULL);
     sgl_progress_examples(NULL);
+    sgl_physical_key_examples(NULL);
     /* sgl_launcher_examples(); */  /* standalone launcher, uncomment to use */
 
     while (!quit) {
@@ -80,6 +93,36 @@ int main(int argc, char *argv[])
         switch (MouseEvent.type) {
         case SDL_QUIT:
             quit = 1;
+            break;
+        case SDL_KEYDOWN:
+            /* map the PC keyboard to physical key events */
+            switch (MouseEvent.key.keysym.sym) {
+            case SDLK_UP:
+                sgl_physical_key_handler(PHYSICAL_KEY_UP, true);
+                break;
+            case SDLK_DOWN:
+                sgl_physical_key_handler(PHYSICAL_KEY_DOWN, true);
+                break;
+            case SDLK_LEFT:
+                sgl_physical_key_handler(PHYSICAL_KEY_LEFT, true);
+                break;
+            case SDLK_RIGHT:
+                sgl_physical_key_handler(PHYSICAL_KEY_RIGHT, true);
+                break;
+            case SDLK_RETURN:
+                sgl_physical_key_handler(PHYSICAL_KEY_ENTER, true);
+                break;
+            case SDLK_ESCAPE:
+                sgl_physical_key_handler(PHYSICAL_KEY_ESC, true);
+                break;
+            default:
+                break;
+            }
+            break;
+        case SDL_KEYUP:
+            if (MouseEvent.key.keysym.sym == SDLK_RETURN) {
+                sgl_physical_key_handler(PHYSICAL_KEY_ENTER, false);
+            }
             break;
         }
         sgl_task_handler();

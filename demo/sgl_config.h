@@ -30,6 +30,6 @@
 #define  CONFIG_SGL_FONT_CONSOLAS24                        1      
 #define  CONFIG_SGL_FONT_CONSOLAS32                        1      
 #define  CONFIG_SGL_FONT_CONSOLAS24_COMPRESS               1            
-
+#define CONFIG_SGL_FOCUSED_WIDTH 2
 
 #endif  //!__SGL_CONFIG_H__
