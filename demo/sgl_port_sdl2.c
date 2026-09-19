@@ -29,11 +29,9 @@
 #include <stdio.h>
 #include <sgl.h>
 
-
 #define  CONFIG_SGL_PANEL_WIDTH         800
 #define  CONFIG_SGL_PANEL_HEIGHT        480
 #define  CONFIG_SGL_PANEL_BUFFER_LINE   100
-
 
 static SDL_Renderer * m_renderer = NULL;
 

@@ -24,7 +24,6 @@ SOURCE    := main.c sgl_port_sdl2.c  test.c bg.c  \
 			../sgl/source/core/sgl_math.c    \
 			../sgl/source/core/sgl_event.c   \
 			../sgl/source/core/sgl_anim.c    \
-			../sgl/source/core/sgl_misc.c    \
 			../sgl/source/mm/lwmem/lwmem.c   \
 			../sgl/source/mm/lwmem/sgl_mm.c  \
 			../sgl/source/draw/sgl_draw_line.c  \
@@ -47,6 +46,7 @@ SOURCE    := main.c sgl_port_sdl2.c  test.c bg.c  \
 			../sgl/source/widgets/msgbox/sgl_msgbox.c   \
 			../sgl/source/widgets/textline/sgl_textline.c  \
 			../sgl/source/widgets/textbox/sgl_textbox.c    \
+			../sgl/source/widgets/textedit/sgl_textedit.c  \
 			../sgl/source/widgets/checkbox/sgl_checkbox.c   \
 			../sgl/source/widgets/listview/sgl_listview.c   \
 			../sgl/source/widgets/icon/sgl_icon.c     \

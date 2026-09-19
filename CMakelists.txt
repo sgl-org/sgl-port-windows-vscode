@@ -53,12 +53,18 @@ set(DEMO_SOURCES
     ${DEMO_DIR}/bg.c
     ${SGL_ROOT_DIR}/sgl/examples/button.c
     ${SGL_ROOT_DIR}/sgl/examples/label.c
+    ${SGL_ROOT_DIR}/sgl/examples/label_ext.c
+    ${SGL_ROOT_DIR}/sgl/examples/textedit.c
     ${SGL_ROOT_DIR}/sgl/examples/rect.c
+    ${SGL_ROOT_DIR}/sgl/examples/rect_ext.c
+    ${SGL_ROOT_DIR}/sgl/examples/img_ext.c
+    ${SGL_ROOT_DIR}/sgl/examples/music_player.c
     ${SGL_ROOT_DIR}/sgl/examples/scrollview.c
     ${SGL_ROOT_DIR}/sgl/examples/menu.c
     ${SGL_ROOT_DIR}/sgl/examples/launcher.c
     ${SGL_ROOT_DIR}/sgl/examples/2dball.c
     ${SGL_ROOT_DIR}/sgl/examples/analogclock.c
+    ${SGL_ROOT_DIR}/sgl/examples/arc.c
     ${SGL_ROOT_DIR}/sgl/examples/bar.c
     ${SGL_ROOT_DIR}/sgl/examples/battery.c
     ${SGL_ROOT_DIR}/sgl/examples/dropdown.c
@@ -74,6 +80,11 @@ set(DEMO_SOURCES
     ${SGL_ROOT_DIR}/sgl/examples/msgbox.c
     ${SGL_ROOT_DIR}/sgl/examples/progress.c
     ${SGL_ROOT_DIR}/sgl/examples/physical_key.c
+    ${SGL_ROOT_DIR}/sgl/examples/viewlist.c
+    ${SGL_ROOT_DIR}/sgl/examples/tabview.c
+    ${SGL_ROOT_DIR}/sgl/source/components/games/2048/sgl_2048.c
+    ${SGL_ROOT_DIR}/images/output/rect_pixmap_imgs.c
+    ${SGL_ROOT_DIR}/images/output/music_img.c
 )
 
 set(SDL2_LIB_NAME
@@ -110,8 +121,6 @@ install(TARGETS sgl_simulator
     RUNTIME DESTINATION bin
 )
 
-# 复制配置文件到构建目录
-file(COPY ${DEMO_DIR}/lm.cfg DESTINATION ${CMAKE_BINARY_DIR}/)
 
 # 输出信息
 message(STATUS "SGL project configured successfully")
