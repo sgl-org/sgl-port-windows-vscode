@@ -34,6 +34,8 @@
 #define  CONFIG_SGL_PANEL_BUFFER_LINE   100
 
 static SDL_Renderer * m_renderer = NULL;
+static SDL_Texture  * m_texture = NULL;   /* persistent texture, created once */
+static bool frame_pending = false;        /* slice uploaded, needs present */
 
 typedef struct sgl_port_sdl2 {
     SDL_Window    *m_window;
@@ -78,13 +80,22 @@ static int sdl_create_windows(SDL_Window **m_window, SDL_Renderer **m_renderer, 
 }
 
 
-static void flush_window(SDL_Renderer * m_renderer)
+static void flush_window_begin(void)
 {
-    SDL_Texture *texture = SDL_CreateTexture(m_renderer, SDL_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, CONFIG_SGL_PANEL_WIDTH, CONFIG_SGL_PANEL_HEIGHT);
-    SDL_UpdateTexture(texture, NULL, sdl2_frame_buffer, CONFIG_SGL_PANEL_WIDTH * sizeof(sgl_color_t));
-    SDL_RenderCopy(m_renderer, texture, NULL, NULL);
+    /* create the texture once and reuse it for every frame */
+    if (m_texture == NULL) {
+        m_texture = SDL_CreateTexture(m_renderer, SDL_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING,
+                                      CONFIG_SGL_PANEL_WIDTH, CONFIG_SGL_PANEL_HEIGHT);
+    }
+}
+
+static void flush_window_end(void)
+{
+    /* upload the whole frame buffer and present once per frame */
+    SDL_UpdateTexture(m_texture, NULL, sdl2_frame_buffer, CONFIG_SGL_PANEL_WIDTH * sizeof(sgl_color_t));
+    SDL_RenderCopy(m_renderer, m_texture, NULL, NULL);
     SDL_RenderPresent(m_renderer);
-    SDL_DestroyTexture(texture);
+    frame_pending = false;
 }
 
 
@@ -160,7 +171,9 @@ static void panel_flush_area(sgl_area_t *area, sgl_color_t *src)
         src += w;
     }
 
-    flush_window(m_renderer);
+    /* only mark that this frame needs presenting, actual present is
+     * deferred to the end of the frame to avoid one Present per slice */
+    frame_pending = true;
     sgl_fbdev_flush_ready();
 }
 
@@ -210,6 +223,9 @@ sgl_port_sdl2_t* sgl_port_sdl2_init(void)
         return NULL;
     }
 
+    /* create the streaming texture once, reused for every frame */
+    flush_window_begin();
+
     sdl2_dev->systick = SDL_AddTimer(1000, system_tick, sdl2_dev);
     sdl2_dev->anim_systick = SDL_AddTimer(1, anim_systick, sdl2_dev);
     sdl2_dev->frame_count = 0;
@@ -229,6 +245,16 @@ size_t sgl_port_sdl2_get_frame_count(sgl_port_sdl2_t* sdl2_dev)
 }
 
 
+void sgl_port_sdl2_frame_present(void)
+{
+    /* call once per main-loop iteration, after sgl_task_handler(),
+     * presents the frame only when at least one slice was flushed */
+    if (frame_pending) {
+        flush_window_end();
+    }
+}
+
+
 void sgl_port_sdl2_increase_frame_count(sgl_port_sdl2_t* sdl2_dev)
 {
     sdl2_dev->frame_count ++;
@@ -237,7 +263,9 @@ void sgl_port_sdl2_increase_frame_count(sgl_port_sdl2_t* sdl2_dev)
 void sgl_port_sdl2_deinit(sgl_port_sdl2_t* sdl2_dev)
 {
     SDL_RemoveTimer(sdl2_dev->systick);
-    SDL_RemoveTimer(sdl2_dev->anim_systick);
-    SDL_DestroyWindow(sdl2_dev->m_window);
+    SDL_RemoveTimer(sdl2_dev->anim_systick);    if (m_texture != NULL) {
+        SDL_DestroyTexture(m_texture);
+        m_texture = NULL;
+    }    SDL_DestroyWindow(sdl2_dev->m_window);
     SDL_DestroyRenderer(m_renderer);
 }

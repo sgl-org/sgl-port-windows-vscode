@@ -80,6 +80,7 @@ set(DEMO_SOURCES
     ${SGL_ROOT_DIR}/sgl/examples/physical_key.c
     ${SGL_ROOT_DIR}/sgl/examples/viewlist.c
     ${SGL_ROOT_DIR}/sgl/examples/tabview.c
+    ${SGL_ROOT_DIR}/sgl/examples/spectrum.c
     ${SGL_ROOT_DIR}/sgl/source/components/games/2048/sgl_2048.c
 )
 
