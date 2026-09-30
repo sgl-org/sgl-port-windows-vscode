@@ -57,8 +57,6 @@ set(DEMO_SOURCES
     ${SGL_ROOT_DIR}/sgl/examples/textedit.c
     ${SGL_ROOT_DIR}/sgl/examples/rect.c
     ${SGL_ROOT_DIR}/sgl/examples/rect_ext.c
-    ${SGL_ROOT_DIR}/sgl/examples/img_ext.c
-    ${SGL_ROOT_DIR}/sgl/examples/music_player.c
     ${SGL_ROOT_DIR}/sgl/examples/scrollview.c
     ${SGL_ROOT_DIR}/sgl/examples/menu.c
     ${SGL_ROOT_DIR}/sgl/examples/launcher.c
@@ -83,8 +81,6 @@ set(DEMO_SOURCES
     ${SGL_ROOT_DIR}/sgl/examples/viewlist.c
     ${SGL_ROOT_DIR}/sgl/examples/tabview.c
     ${SGL_ROOT_DIR}/sgl/source/components/games/2048/sgl_2048.c
-    ${SGL_ROOT_DIR}/images/output/rect_pixmap_imgs.c
-    ${SGL_ROOT_DIR}/images/output/music_img.c
 )
 
 set(SDL2_LIB_NAME
@@ -121,9 +117,7 @@ install(TARGETS sgl_simulator
     RUNTIME DESTINATION bin
 )
 
-
 # 输出信息
 message(STATUS "SGL project configured successfully")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-
