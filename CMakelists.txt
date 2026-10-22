@@ -24,6 +24,12 @@ file(GLOB SGL_DRAW_SOURCES ${SGL_ROOT_DIR}/sgl/source/draw/*.c)
 file(GLOB SGL_FONTS_SOURCES ${SGL_ROOT_DIR}/sgl/source/fonts/*.c)
 file(GLOB SGL_MM_SOURCES ${SGL_ROOT_DIR}/sgl/source/mm/lwmem/*.c)
 file(GLOB SGL_WIDGETS_SOURCES ${SGL_ROOT_DIR}/sgl/source/widgets/*/*.c)
+file(GLOB SGL_FS_SOURCES ${SGL_ROOT_DIR}/sgl/source/fs/*/*.c)
+# 排除误放入 widget 目录中的旧实现 / 参考文件（不可编译）
+list(REMOVE_ITEM SGL_WIDGETS_SOURCES ${SGL_ROOT_DIR}/sgl/source/widgets/msgbox/lv_msgbox.c)
+list(REMOVE_ITEM SGL_WIDGETS_SOURCES ${SGL_ROOT_DIR}/sgl/source/widgets/gif/sgl_gifdec.c)
+# 排除 littlefs 官方参考代码（仅作参考，不参与编译，实现见 sgl_littlefs.c）
+list(REMOVE_ITEM SGL_FS_SOURCES ${SGL_ROOT_DIR}/sgl/source/fs/littlefs/lfs.c)
 
 # 合并所有 SGL 源文件
 set(SGL_SOURCES
@@ -33,6 +39,7 @@ set(SGL_SOURCES
     ${SGL_FONTS_SOURCES}
     ${SGL_MM_SOURCES}
     ${SGL_WIDGETS_SOURCES}
+    ${SGL_FS_SOURCES}
 )
 
 # 包含目录
@@ -45,46 +52,18 @@ include_directories(
 # 创建SGL库
 add_library(sgl STATIC ${SGL_SOURCES})
 
-# Demo应用程序源文件
+# 示例清单集中在 sgl/examples/build.cmake 里维护，这里只选要编译哪些示例：
+#   sgl_examples_select(SGL_EXAMPLES)                      -> 全部示例
+#   sgl_examples_select(SGL_EXAMPLES win filebrowser ...)   -> 只编译列出的示例
+include(${SGL_ROOT_DIR}/sgl/examples/build.cmake)
+sgl_examples_select(SGL_EXAMPLES)
+
+# 模拟器本体 + 性能基准组件 + 上一步选出的示例
 set(DEMO_SOURCES
     ${DEMO_DIR}/main.c
     ${DEMO_DIR}/sgl_port_sdl2.c
-    ${DEMO_DIR}/test.c
-    ${DEMO_DIR}/bg.c
-    ${SGL_ROOT_DIR}/sgl/examples/button.c
-    ${SGL_ROOT_DIR}/sgl/examples/label.c
-    ${SGL_ROOT_DIR}/sgl/examples/label_ext.c
-    ${SGL_ROOT_DIR}/sgl/examples/textedit.c
-    ${SGL_ROOT_DIR}/sgl/examples/rect.c
-    ${SGL_ROOT_DIR}/sgl/examples/rect_ext.c
-    ${SGL_ROOT_DIR}/sgl/examples/img_ext.c
-    ${SGL_ROOT_DIR}/sgl/examples/music_player.c
-    ${SGL_ROOT_DIR}/sgl/examples/scrollview.c
-    ${SGL_ROOT_DIR}/sgl/examples/menu.c
-    ${SGL_ROOT_DIR}/sgl/examples/launcher.c
-    ${SGL_ROOT_DIR}/sgl/examples/2dball.c
-    ${SGL_ROOT_DIR}/sgl/examples/analogclock.c
-    ${SGL_ROOT_DIR}/sgl/examples/arc.c
-    ${SGL_ROOT_DIR}/sgl/examples/bar.c
-    ${SGL_ROOT_DIR}/sgl/examples/battery.c
-    ${SGL_ROOT_DIR}/sgl/examples/dropdown.c
-    ${SGL_ROOT_DIR}/sgl/examples/stepper.c
-    ${SGL_ROOT_DIR}/sgl/examples/switch.c
-    ${SGL_ROOT_DIR}/sgl/examples/roller.c
-    ${SGL_ROOT_DIR}/sgl/examples/slider.c
-    ${SGL_ROOT_DIR}/sgl/examples/led.c
-    ${SGL_ROOT_DIR}/sgl/examples/scope.c
-    ${SGL_ROOT_DIR}/sgl/examples/qrcode.c
-    ${SGL_ROOT_DIR}/sgl/examples/textlist.c
-    ${SGL_ROOT_DIR}/sgl/examples/checkbox.c
-    ${SGL_ROOT_DIR}/sgl/examples/msgbox.c
-    ${SGL_ROOT_DIR}/sgl/examples/progress.c
-    ${SGL_ROOT_DIR}/sgl/examples/physical_key.c
-    ${SGL_ROOT_DIR}/sgl/examples/viewlist.c
-    ${SGL_ROOT_DIR}/sgl/examples/tabview.c
-    ${SGL_ROOT_DIR}/sgl/source/components/games/2048/sgl_2048.c
-    ${SGL_ROOT_DIR}/images/output/rect_pixmap_imgs.c
-    ${SGL_ROOT_DIR}/images/output/music_img.c
+    ${SGL_ROOT_DIR}/sgl/source/components/bench/sgl_bench.c
+    ${SGL_EXAMPLES}
 )
 
 set(SDL2_LIB_NAME
@@ -96,6 +75,9 @@ link_directories(
 
 # 创建演示应用程序
 add_executable(sgl_simulator ${DEMO_SOURCES})
+target_compile_definitions(sgl_simulator PRIVATE
+    SGL_AVI_DEMO_BASE_DIR=\"${SGL_ROOT_DIR}\"
+)
 
 # 链接库
 target_link_libraries(sgl_simulator sgl ${SDL2_LIB_NAME})

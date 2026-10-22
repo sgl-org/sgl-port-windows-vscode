@@ -29,11 +29,22 @@
 #include <stdio.h>
 #include <sgl.h>
 
+/* Panel resolution. Override from the build system (-DCONFIG_SGL_PANEL_WIDTH=...)
+ * to check that the demo (and the benchmark) adapt to other screen sizes. */
+#ifndef  CONFIG_SGL_PANEL_WIDTH
 #define  CONFIG_SGL_PANEL_WIDTH         800
+#endif
+#ifndef  CONFIG_SGL_PANEL_HEIGHT
 #define  CONFIG_SGL_PANEL_HEIGHT        480
-#define  CONFIG_SGL_PANEL_BUFFER_LINE   100
+#endif
+#ifndef  CONFIG_SGL_PANEL_BUFFER_LINE
+#define  CONFIG_SGL_PANEL_BUFFER_LINE   10
+#endif
 
 static SDL_Renderer * m_renderer = NULL;
+
+/* streaming texture created once, updated + presented inside panel_flush_area */
+static SDL_Texture * m_texture = NULL;
 
 typedef struct sgl_port_sdl2 {
     SDL_Window    *m_window;
@@ -42,6 +53,13 @@ typedef struct sgl_port_sdl2 {
     uint32_t      frame_count;
 } sgl_port_sdl2_t;
 
+/* device instance, kept for the frame_count (FPS) bookkeeping in flush */
+static sgl_port_sdl2_t * m_dev = NULL;
+
+/* present coalescing during a WARP transition: cap the real SDL present rate
+ * so hundreds of per-row pushes a frame collapse into ~60 uploads a second */
+#define  SGL_PRESENT_MIN_MS       15u
+static uint32_t          s_present_last = 0;
 
 #if (CONFIG_SGL_FBDEV_PIXEL_DEPTH == 32)
 #define  SDL_PIXEL_FORMAT       SDL_PIXELFORMAT_ARGB8888
@@ -74,18 +92,19 @@ static int sdl_create_windows(SDL_Window **m_window, SDL_Renderer **m_renderer, 
 
     SDL_SetRenderDrawColor( *m_renderer, 0, 0, 0, 255);
     SDL_RenderClear( *m_renderer );
+
+    if (m_texture != NULL) {
+        SDL_DestroyTexture(m_texture);
+        m_texture = NULL;
+    }
+    m_texture = SDL_CreateTexture(*m_renderer, SDL_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING,
+                                  CONFIG_SGL_PANEL_WIDTH, CONFIG_SGL_PANEL_HEIGHT);
+    if (m_texture == NULL) {
+        return -1;
+    }
     return 0;
 }
 
-
-static void flush_window(SDL_Renderer * m_renderer)
-{
-    SDL_Texture *texture = SDL_CreateTexture(m_renderer, SDL_PIXEL_FORMAT, SDL_TEXTUREACCESS_STREAMING, CONFIG_SGL_PANEL_WIDTH, CONFIG_SGL_PANEL_HEIGHT);
-    SDL_UpdateTexture(texture, NULL, sdl2_frame_buffer, CONFIG_SGL_PANEL_WIDTH * sizeof(sgl_color_t));
-    SDL_RenderCopy(m_renderer, texture, NULL, NULL);
-    SDL_RenderPresent(m_renderer);
-    SDL_DestroyTexture(texture);
-}
 
 
 static uint32_t system_tick(uint32_t interval, void *param)
@@ -160,14 +179,38 @@ static void panel_flush_area(sgl_area_t *area, sgl_color_t *src)
         src += w;
     }
 
-    flush_window(m_renderer);
+    /* flush == 刷屏：上传脏矩形后立即 RenderCopy+RenderPresent，
+     * 渲染节奏由 sgl_task_handler 的 tick 限制把关，无独立 present 步骤 */
+    if (m_texture != NULL && m_renderer != NULL) {
+        /* Upload just the dirty rect every flush, but cap the real
+         * RenderCopy+Present rate: a full-screen (or transition) refresh issues
+         * one push per band (dozens a frame), and presenting each one hammers the
+         * SDL swap chain -- a simulator-only cost (a real panel just DMA-pushes
+         * each band). Pace is governed by sgl_task_handler's tick, not present. */
+        SDL_Rect r = { area->x1, area->y1, w, h };
+        SDL_UpdateTexture(m_texture, &r,
+                          sdl2_frame_buffer + area->y1 * CONFIG_SGL_PANEL_WIDTH + area->x1,
+                          CONFIG_SGL_PANEL_WIDTH * sizeof(sgl_color_t));
+        uint32_t now = SDL_GetTicks();
+        /* present on the bottom band (completes a top-to-bottom full refresh) or
+         * whenever the throttle window elapsed, so the composited frame is shown */
+        int last_band = (area->y2 >= (CONFIG_SGL_PANEL_HEIGHT - 1));
+        if (last_band || (now - s_present_last) >= SGL_PRESENT_MIN_MS) {
+            SDL_RenderCopy(m_renderer, m_texture, NULL, NULL);
+            SDL_RenderPresent(m_renderer);
+            s_present_last = now;
+            if (m_dev != NULL) {
+                m_dev->frame_count++;
+            }
+        }
+    }
+
     sgl_fbdev_flush_ready();
 }
 
 
 static sgl_color_t panel_buffer0[CONFIG_SGL_PANEL_WIDTH * CONFIG_SGL_PANEL_BUFFER_LINE] = {0};
 static sgl_color_t panel_buffer1[CONFIG_SGL_PANEL_WIDTH * CONFIG_SGL_PANEL_BUFFER_LINE] = {0};
-
 
 void log_stdout(const char *str)
 {
@@ -197,13 +240,13 @@ sgl_port_sdl2_t* sgl_port_sdl2_init(void)
         SGL_LOG_ERROR("SGL SDL2 device alloc initialize failed");
         return NULL;
     }
+    m_dev = sdl2_dev;
 
     if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0 ) {
         SGL_LOG_ERROR("SGL SDL2 initialize failed");
         free(sdl2_dev);
         return NULL;
     }
-
     if(sdl_create_windows(&sdl2_dev->m_window, &m_renderer, "SGL SDL2 demo") < 0) {
         SGL_LOG_ERROR("SGL SDL2 create window failed");
         free(sdl2_dev);
@@ -228,7 +271,6 @@ size_t sgl_port_sdl2_get_frame_count(sgl_port_sdl2_t* sdl2_dev)
     return sdl2_dev->frame_count;
 }
 
-
 void sgl_port_sdl2_increase_frame_count(sgl_port_sdl2_t* sdl2_dev)
 {
     sdl2_dev->frame_count ++;
@@ -238,6 +280,10 @@ void sgl_port_sdl2_deinit(sgl_port_sdl2_t* sdl2_dev)
 {
     SDL_RemoveTimer(sdl2_dev->systick);
     SDL_RemoveTimer(sdl2_dev->anim_systick);
+    if (m_texture != NULL) {
+        SDL_DestroyTexture(m_texture);
+        m_texture = NULL;
+    }
     SDL_DestroyWindow(sdl2_dev->m_window);
     SDL_DestroyRenderer(m_renderer);
 }

@@ -1,1 +1,4 @@
 build
+movie.avi
+*.avi
+.bench_out/
